@@ -1,0 +1,5 @@
+# FF3 extension
+comment = 'FPE FF3-1 implementation'
+default_version = '1.0'
+module_pathname = '$libdir/pg_ff3'
+relocatable = false
