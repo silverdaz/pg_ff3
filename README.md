@@ -11,7 +11,7 @@ And create the extension
 
 Update the postgresql.conf file with
 
-	shared_preload_libraries = 'pg_ff3
+	shared_preload_libraries = 'pg_ff3'
 	ff3.passphrase = 'super-secret'
 	ff3.tweak = 'some-random-text'
 	ff3.group = 'some-group-name'
