@@ -76,4 +76,4 @@ database=> SELECT * FROM testing;
  (2 rows)
 ```
 
-Internally, the `ff3.int8` _is_ a bigint in the range `[0, 999999999999999999]` that gets displayed over 18 chars, padding with zeros.
+Internally, the `ff3.int8` _is_ a bigint in the range `[0, 999999999999999999]` that gets displayed over 18 chars, padded with zeros.
