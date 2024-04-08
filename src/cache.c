@@ -1,11 +1,7 @@
 #include "includes.h"
 
-#include "funcapi.h"
 #include "executor/spi.h"
-#include "utils/builtins.h"
 #include "utils/memutils.h"
-#include "access/htup_details.h"
-#include "catalog/pg_type.h"
 #include "pgstat.h"
 #include "tcop/tcopprot.h" /* for "debug_query_string" */
 

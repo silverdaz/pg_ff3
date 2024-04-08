@@ -10,26 +10,8 @@
 
 #include "includes.h"
 
-#include "funcapi.h"
-//#include "access/xact.h"
-#include "executor/spi.h"
-//#include "lib/stringinfo.h"
-#include "utils/builtins.h" /* for hex_decode */
-//#include "utils/snapmgr.h"
-//#include "tcop/utility.h"
-#include "utils/memutils.h"
-#include "access/htup_details.h"
-#include "catalog/pg_type.h"
-#include "pgstat.h"
-//#include "libpq/pqsignal.h" /* for pqsignal */
-#include "tcop/tcopprot.h" /* for "debug_query_string" */
 #include "miscadmin.h"
-//#include "common/base64.h"
 #include "utils/guc.h"
-#include "utils/acl.h"
-#include "libpq/pqformat.h" /* for send/recv functions */
-#include "catalog/pg_authid.h"
-#include "utils/syscache.h"
 
 PG_MODULE_MAGIC; /* only one time */
 
