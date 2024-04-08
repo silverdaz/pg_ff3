@@ -53,7 +53,7 @@ rev_bytes(unsigned char X[], int len)
 
 /* convert numeral string in reverse order to number */
 static void
-str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned int len, BN_CTX *ctx)
+str2num_rev(BIGNUM *Y, const uint8_t *X, unsigned int radix, unsigned int len, BN_CTX *ctx)
 {
   BIGNUM *r = NULL,
          *x = NULL;
@@ -77,7 +77,7 @@ str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned int l
 
 /* convert number to numeral string in reverse order */
 static void
-num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *ctx)
+num2str_rev(const BIGNUM *X, uint8_t *Y, unsigned int radix, int len, BN_CTX *ctx)
 {
   BIGNUM *dv = NULL,
          *rem = NULL,
@@ -93,7 +93,7 @@ num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CT
 
   BN_copy(XX, X);
   BN_set_word(r, radix);
-  memset(Y, 0, len << 2);
+  memset(Y, 0, len);
     
   for (i = 0; i < len; ++i) {
     // XX / r = dv ... rem
@@ -116,9 +116,9 @@ do_encrypt(EVP_CIPHER_CTX *evp, unsigned char src[16], unsigned char dst[16])
 
 int
 ff3_encrypt(ff3_engine_t *engine,
-	    const unsigned int * const plaintext,
+	    const uint8_t * const plaintext,
 	    unsigned int len,
-	    unsigned int * const ciphertext)
+	    uint8_t * const ciphertext)
 {
     BIGNUM *bnum = NULL,
            *y = NULL,
@@ -128,11 +128,12 @@ ff3_encrypt(ff3_engine_t *engine,
            *qpow_v = NULL;
     BN_CTX *ctx = NULL;
     int u, v;
-    unsigned int *A = NULL;
-    unsigned int *B = NULL;
+    uint8_t *A = NULL;
+    uint8_t *B = NULL;
+    uint8_t *C = NULL;
     unsigned int temp, i, m;
-    unsigned char S[16], P[16];
-    unsigned char *buf = NULL;
+    uint8_t S[16], P[16];
+    uint8_t *buf = NULL;
     int buflen;
     unsigned int err = 1;
 
@@ -148,10 +149,7 @@ ff3_encrypt(ff3_engine_t *engine,
     u = ceil2(len, 1);
     v = len - u;
 
-    // Split the message
-    memcpy(ciphertext, plaintext, len << 2);
-    //memcpy(ciphertext, plaintext, len * (sizeof(int)/sizeof(char)));
-
+    memcpy(ciphertext, plaintext, len);
     A = ciphertext;
     B = ciphertext + u;
 
@@ -196,11 +194,12 @@ ff3_encrypt(ff3_engine_t *engine,
 	BN_mod_add(c, anum, y, (i & 1) ? qpow_v : qpow_u, ctx);
 
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (uint8_t *)( (uintptr_t)A ^ (uintptr_t)B );
+        B = (uint8_t *)( (uintptr_t)B ^ (uintptr_t)A );
+        A = (uint8_t *)( (uintptr_t)A ^ (uintptr_t)B );
 
         num2str_rev(c, B, engine->radix, m, ctx);
+
     }
 
     err = 0; /* success */
@@ -222,9 +221,9 @@ bailout:
 
 int
 ff3_decrypt(ff3_engine_t *engine,
-	    const unsigned int * const ciphertext,
+	    const uint8_t * const ciphertext,
 	    unsigned int len,
-	    unsigned int * const plaintext)
+	    uint8_t * const plaintext)
 {
 
     BIGNUM *bnum = NULL,
@@ -235,8 +234,8 @@ ff3_decrypt(ff3_engine_t *engine,
            *qpow_v = NULL;
     BN_CTX *ctx = NULL;
     int u, v;
-    unsigned int *A = NULL;
-    unsigned int *B = NULL;
+    uint8_t *A = NULL;
+    uint8_t *B = NULL;
     unsigned int temp;
     int i;
     unsigned char S[16], P[16];
@@ -252,12 +251,11 @@ ff3_decrypt(ff3_engine_t *engine,
     qpow_v = BN_new();
     ctx    = BN_CTX_new();
 
-    //memcpy(plaintext, ciphertext, len * (sizeof(int)/sizeof(char)));
-    memcpy(plaintext, ciphertext, len << 2);
-
+    // Calculate split point
     u = ceil2(len, 1);
     v = len - u;
 
+    memcpy(plaintext, ciphertext, len);
     A = plaintext;
     B = plaintext + u;
 
@@ -279,9 +277,7 @@ ff3_decrypt(ff3_engine_t *engine,
         }
         P[3] ^= i & 0xff;
 
-
         // Step ii
-
         str2num_rev(anum, A, engine->radix, len - m, ctx);
         memset(buf, 0, buflen);
         buflen = BN_bn2bin(anum, buf);
@@ -306,9 +302,9 @@ ff3_decrypt(ff3_engine_t *engine,
 	  BN_mod_sub(c, bnum, y, qpow_u, ctx);
 
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (uint8_t *)( (uintptr_t)A ^ (uintptr_t)B );
+        B = (uint8_t *)( (uintptr_t)B ^ (uintptr_t)A );
+        A = (uint8_t *)( (uintptr_t)A ^ (uintptr_t)B );
 
         num2str_rev(c, A, engine->radix, m, ctx);
     }
